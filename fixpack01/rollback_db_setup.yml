@@ -1,0 +1,50 @@
+##
+# Example Ansible playbook that uses the PostgreSQL module.
+# remove it all
+#
+---
+
+- hosts: dbservers
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+
+  tasks:
+
+  - name: Disable and stoping service if exists
+    systemd:
+      service: "postgresql"
+      enabled: no
+      state: stopped
+    register: result_systemd_stop
+    failed_when: "result_systemd_stop is failed and 'Could not find the requested service' not in result_systemd_stop.msg"
+
+  - name: Exterminate postgresql
+    pause:
+      prompt: Please confirm you want to exterminate postgresql! Press return to continue. Press Ctrl+c and then "a" to abort
+
+  - name: "Purge and Uninstall postgresql module..."
+    shell: "sh -c echo y | /usr/bin/apt --purge autoremove postgresql"
+    register: return_txt
+  - debug:
+      var: return_txt.stdout_lines
+
+  - name: "reinit dpkg"
+    shell: "/usr/bin/dpkg --configure -a"
+    register: return_txt
+  - debug:
+      var: return_txt.stdout_lines
+
+#  - name: "Purge and Uninstall the of postgres modules"
+#    shell: "sh -c echo y | /usr/bin/apt --purge autoremove postgresql-common postgresql-client-common"
+#    register: return_txt
+#  - debug:
+#      var: return_txt.stdout_lines
+
+
+  - name: "remove diverse files and folders"
+    shell: "sh -c rm -rf /var/lib/postgresql/; rm -rf /var/log/postgresql/; rm -rf /etc/postgresql/"
+    register: return_txt
+  - debug:
+      var: return_txt.stdout_lines
+

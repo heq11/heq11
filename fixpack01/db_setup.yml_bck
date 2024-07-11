@@ -1,0 +1,17 @@
+###############################################
+#
+#
+###############################################
+---
+
+- name: Install test
+  hosts: dbservers
+  tasks:
+
+  - name: "Udføre test 01"
+    shell: "/usr/bin/touch {{ path_home }}/x.x; /usr/bin/ls -lart {{ path_home }}; hostname"
+    register: return_txt 
+
+  - debug: 
+      var: return_txt.stdout_lines 
+#  - debug: msg="{{ return_txt.stderr }}" 

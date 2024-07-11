@@ -1,17 +1,44 @@
-###############################################
+##
+# Example Ansible playbook that uses the PostgreSQL module.
 #
+# This installs PostgreSQL on an Ubuntu system, creates a database called
+# "myapp" and a user called "django" with password "mysupersecretpassword"
+# with access to the "myapp" database.
 #
-###############################################
 ---
 
-- name: Install test
-  hosts: dbservers
+- hosts: obelix
+  gather_facts: yes
+  become: true
+
+  vars:
+    dbname: myapp
+    dbuser: django
+    dbpassword: mysupersecretpassword
+
   tasks:
+  - name: ensure apt cache is up to date
+    apt: update_cache=yes
 
-  - name: "Udføre test 01"
-    shell: "/usr/bin/touch {{ path_home }}/x.x; /usr/bin/ls -lart {{ path_home }}; hostname"
-    register: return_txt 
+  - name: Add the PostgreSQL APT key
+    apt_key:
+      url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+      state: present
 
-  - debug: 
-      var: return_txt.stdout_lines 
-#  - debug: msg="{{ return_txt.stderr }}" 
+  - name: Add the PostgreSQL APT repositories
+    apt_repository:
+      repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main
+      state: present
+
+  - name: ensure apt cache is up to date
+    apt: update_cache=yes
+
+  - name: ensure packages are installed
+    apt: name={{item}}
+    with_items:
+        - postgresql
+#        - postgresql-common
+        - libpq-dev
+#        - psycopg2
+
+
