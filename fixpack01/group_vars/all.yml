@@ -1,0 +1,6 @@
+####################################
+#
+####################################
+
+test_text		: "Velkommen til HEQ's mini Ansible setup"
+path_home 		: "/home/heq"

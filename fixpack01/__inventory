@@ -1,0 +1,12 @@
+[allhosts]
+asterix
+obelix
+idefix
+
+[webservers]
+asterix
+obelix
+
+[dbservers]
+obelix
+idefix
